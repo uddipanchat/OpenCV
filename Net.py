@@ -31,7 +31,7 @@ class ShapeDetection():
 		#output = cv2.bitwise_and(img, img, mask=mask)
 
 		ret,thresh = cv2.threshold(mask, 40, 255, 0)
-		cv2.imshow("theshold",thresh)
+		#cv2.imshow("theshold",thresh)
 		im2, contours, hier = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
 		c = max(contours, key = cv2.contourArea)
 		cv2.drawContours(output, [c], -1, 255, 3)
@@ -71,7 +71,7 @@ class ShapeDetection():
 
        
 
-cap = cv2.VideoCapture('0')
+cap = cv2.VideoCapture(0)
 
 
 # Check if camera opened successfully
@@ -80,48 +80,51 @@ if (cap.isOpened()== False):
 
 
 while(cap.isOpened()):
-# Capture frame-by-frame
-ret, frame = cap.read()
-if ret == True:
-   # Display the resulting frame
-   cv2.imshow('Frame',frame)
-   # Press Q on keyboard to  exit
-   if cv2.waitKey(25) & 0xFF == ord('q'):
-        break
-   # Break the loop
+	# Capture frame-by-frame
+	ret, frame = cap.read()
+	if ret == True::
+		cv2.imshow('Frame',frame)
+		small_img = cv2.resize(frame, (640,480))
+
+		#
+		#bordersize=10
+		#small_img=cv2.copyMakeBorder(small_img, top=bordersize, bottom=bordersize, left=bordersize, right=bordersize, borderType= cv2.BORDER_CONSTANT, value=[255,255,255] )
+
+		#Create the identity filter, but with the 1 shifted to the right!
+		kernel = np.zeros( (9,9), np.float32)
+		kernel[4,4] = 2.0   #Identity,times two! 
+
+		#Create a box filter:
+		boxFilter = np.ones( (9,9), np.float32) / 81.0
+
+		#Subtract the two:
+		kernel = kernel - boxFilter
+
+
+		#Note that we are subject to overflow and underflow here...but I believe that
+		# filter2D clips top and bottom ranges on the output, plus you'd need a
+		# very bright or very dark pixel surrounded by the opposite type.
+
+		custom = cv2.filter2D(small_img, -1, kernel)
+		#cv2.imshow("Sharpen", custom)
+		ShapeDetection = ShapeDetection(custom)
+		ShapeDetection.Preprocess()
+
+		#cv2.imshow("Image", small_img)
+		
+	# Press Q on keyboard to  exit
+	if cv2.waitKey(25) & 0xFF == ord('q'):
+		break
+		# Break the loop
 	else: 
-      break
+		break
 
+cv2.waitKey(0)
 
+# When everything done, release the video capture object
+cap.release()
+ 
+cv2.destroyAllWindows()
 
 
 #img = cv2.imread("/home/uddipan/Downloads/P5080325.JPG") 
-small_img = cv2.resize(img, (640,480))
-
-#
-#bordersize=10
-#small_img=cv2.copyMakeBorder(small_img, top=bordersize, bottom=bordersize, left=bordersize, right=bordersize, borderType= cv2.BORDER_CONSTANT, value=[255,255,255] )
-
-#Create the identity filter, but with the 1 shifted to the right!
-kernel = np.zeros( (9,9), np.float32)
-kernel[4,4] = 2.0   #Identity,times two! 
-
-#Create a box filter:
-boxFilter = np.ones( (9,9), np.float32) / 81.0
-
-#Subtract the two:
-kernel = kernel - boxFilter
-
-
-#Note that we are subject to overflow and underflow here...but I believe that
-# filter2D clips top and bottom ranges on the output, plus you'd need a
-# very bright or very dark pixel surrounded by the opposite type.
-
-custom = cv2.filter2D(small_img, -1, kernel)
-cv2.imshow("Sharpen", custom)
-ShapeDetection = ShapeDetection(custom)
-ShapeDetection.Preprocess()
-
-cv2.imshow("Image", small_img)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
