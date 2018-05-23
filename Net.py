@@ -35,7 +35,8 @@ class ShapeDetection():
 		im2, contours, hier = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
 		c = max(contours, key = cv2.contourArea)
 		cv2.drawContours(output, [c], -1, 255, 3)
-		cv2.imshow("Final_Image",output)
+		#cv2.imshow("Final_Image",output)
+		return(output)
 
 		#if len(contours) != 0:
 		
@@ -68,7 +69,6 @@ class ShapeDetection():
 		cv2.drawContours(im2, [c], 1, (0, 255, 255), 2)
 		
 '''
-
        
 
 cap = cv2.VideoCapture(0)
@@ -82,7 +82,7 @@ if (cap.isOpened()== False):
 while(cap.isOpened()):
 	# Capture frame-by-frame
 	ret, frame = cap.read()
-	if ret == True::
+	if ret == True:
 		cv2.imshow('Frame',frame)
 		small_img = cv2.resize(frame, (640,480))
 
@@ -108,7 +108,11 @@ while(cap.isOpened()):
 		custom = cv2.filter2D(small_img, -1, kernel)
 		#cv2.imshow("Sharpen", custom)
 		ShapeDetection = ShapeDetection(custom)
-		ShapeDetection.Preprocess()
+		frame = ShapeDetection.Preprocess()
+		height, width, channels = frame.shape
+		out = cv2.VideoWriter('outpy.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 10, (width,height))
+		out.write(frame)
+
 
 		#cv2.imshow("Image", small_img)
 		
