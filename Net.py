@@ -71,7 +71,7 @@ class ShapeDetection():
 '''
        
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture('/home/uddipan/Documents/Aquaai/bagfile_images/output.mpg')
 
 
 # Check if camera opened successfully
@@ -83,7 +83,7 @@ while(cap.isOpened()):
 	# Capture frame-by-frame
 	ret, frame = cap.read()
 	if ret == True:
-		cv2.imshow('Frame',frame)
+		#cv2.imshow('Frame',frame)
 		small_img = cv2.resize(frame, (640,480))
 
 		#
@@ -115,6 +115,8 @@ while(cap.isOpened()):
 
 
 		#cv2.imshow("Image", small_img)
+
+
 		
 	# Press Q on keyboard to  exit
 	if cv2.waitKey(25) & 0xFF == ord('q'):
