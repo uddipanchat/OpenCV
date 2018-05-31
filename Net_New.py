@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import imutils
 from imutils.video import VideoStream
+from random import *
 
 
 
@@ -14,12 +15,32 @@ def DetectHoles(img):
 		
 
 	ret,thresh = cv2.threshold(mask, 40, 255, 0)
+	height, width = thresh.shape
 	#cv2.imshow("theshold",thresh)
 	im2, contours, hier = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
 	c = max(contours, key = cv2.contourArea)
-	cv2.drawContours(output, [c], -1, 255, 3)
+	#cv2.drawContours(output, [c], -1, (0,0,255), 3)
+	#return(output)
 	#cv2.imshow("Final_Image",output)
-	return(output)
+	
+
+
+	false_detection = False
+	for i in range(0,(len(c)-1)):
+		if (c[i][0][0] == 0) or (c[i][0][0] == height) or ((c[i][0][1] == 0) or (c[i][0][1] == width)):
+			false_detection = True
+			break;
+
+	if false_detection == True:
+		cv2.drawContours(output, [c], -1, (0,0,255), 3)
+		return(output)
+	else:
+		cv2.drawContours(output,[c], -1 , 255, 1)
+		image_no = randint(0,100)
+
+		cv2.imwrite('/home/uddipan/Documents/NetDetection/Detected_Images/NetDefect'+ str(image_no) +'.png',output)
+		return(output)
+
 
 
 def SharpenImage(img):
