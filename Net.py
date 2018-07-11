@@ -18,9 +18,10 @@ class ShapeDetection():
 		self.img = img
     
 	def Preprocess(self):
-		lower_bound = np.array([80,80,80], dtype=np.uint8)
-		upper_bound = np.array([255,255,255], dtype=np.uint8)
+		lower_bound = np.array([0,100,100], dtype=np.uint8)
+		upper_bound = np.array([20	,255,255], dtype=np.uint8)
 		mask = cv2.inRange(self.img,lower_bound,upper_bound)
+		cv2.imshow("Mask",mask)
 		mask = 255 - mask
 		output = cv2.bitwise_and(self.img, self.img, mask=mask)
 		#im1 = cv2.cvtColor( self.img, cv2.COLOR_RGB2GRAY )
@@ -31,11 +32,11 @@ class ShapeDetection():
 		#output = cv2.bitwise_and(img, img, mask=mask)
 
 		ret,thresh = cv2.threshold(mask, 40, 255, 0)
-		#cv2.imshow("theshold",thresh)
+		cv2.imshow("theshold",thresh)
 		im2, contours, hier = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
 		c = max(contours, key = cv2.contourArea)
 		cv2.drawContours(output, [c], -1, 255, 3)
-		#cv2.imshow("Final_Image",output)
+		cv2.imshow("Final_Image",output)
 		return(output)
 
 		#if len(contours) != 0:
@@ -70,8 +71,8 @@ class ShapeDetection():
 		
 '''
        
-
-cap = cv2.VideoCapture('/home/uddipan/Documents/Aquaai/bagfile_images/output.mpg')
+cap = cv2.imread('/home/uddipan/Downloads/hole.JPG')
+#cap = cv2.VideoCapture('/home/uddipan/Documents/Aquaai/bagfile_images/output.mpg')
 
 
 # Check if camera opened successfully
@@ -83,8 +84,15 @@ while(cap.isOpened()):
 	# Capture frame-by-frame
 	ret, frame = cap.read()
 	if ret == True:
+		
+
+		small_frame = cv2.resize(frame, (640,480))
+
 		#cv2.imshow('Frame',frame)
-		small_img = cv2.resize(frame, (640,480))
+		
+		#gray = cv2.cvtColor(small_frame, cv2.COLOR_BGR2HSV)
+		#cv2.imshow("HSV",hsv)
+		
 
 		#
 		#bordersize=10
@@ -105,16 +113,16 @@ while(cap.isOpened()):
 		# filter2D clips top and bottom ranges on the output, plus you'd need a
 		# very bright or very dark pixel surrounded by the opposite type.
 
-		custom = cv2.filter2D(small_img, -1, kernel)
-		#cv2.imshow("Sharpen", custom)
+		custom = cv2.filter2D(small_frame, -1, kernel)
+		cv2.imshow("Sharpen", custom)
 		ShapeDetection = ShapeDetection(custom)
 		frame = ShapeDetection.Preprocess()
 		height, width, channels = frame.shape
-		out = cv2.VideoWriter('outpy.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 10, (width,height))
-		out.write(frame)
+		#out = cv2.VideoWriter('outpy.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 10, (width,height))
+		#out.write(frame)
 
 
-		#cv2.imshow("Image", small_img)
+		cv2.imshow("Image", frame)
 
 
 		

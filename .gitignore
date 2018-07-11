@@ -1,2 +1,5 @@
 # Ignore all video files of .avi format
 *.avi
+/Detected_Images
+*.png
+*.jpg

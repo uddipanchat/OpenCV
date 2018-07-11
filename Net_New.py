@@ -6,6 +6,41 @@ from random import *
 
 
 
+
+def Find_Index(contours,max_contour):
+	index = 0
+	max = np.array(max_contour)
+	for cnt in contours:
+		if np.array_equal(np.array(cnt),max):
+			return(index)
+		else:
+			index = index + 1
+
+
+
+def Find_True_Contour(contours,height,width):
+
+	false_detection = False
+	c = max(contours, key=cv2.contourArea)
+	for i in range(0,(len(c)-1)):
+		if (c[i][0][0] == 0) or (c[i][0][0] == height) or ((c[i][0][1] == 0) or (c[i][0][1] == width)):
+			false_detection = True
+			break;
+	if false_detection == True:
+		index = Find_Index(contours,c)
+		#print("No of contours",len(contours))
+		#print("Index:",index)
+		if (len(contours) >  1):
+			del contours[index]
+			return(Find_True_Contour(contours,height,width))
+		else:
+			false_detection = False
+	if false_detection == False:
+		#print(c)
+		return(c)		
+
+
+
 def DetectHoles(img):
 	lower_bound = np.array([80,80,80], dtype=np.uint8)
 	upper_bound = np.array([255,255,255], dtype=np.uint8)
@@ -18,7 +53,19 @@ def DetectHoles(img):
 	height, width = thresh.shape
 	#cv2.imshow("theshold",thresh)
 	im2, contours, hier = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
+	#con = np.array(contours)
+	#print(con.shape)
+	print("Initial no of contours:", len(contours))
+	#c1=[]
+	c = Find_True_Contour(contours,height,width)
+	#print(c)
+	cv2.drawContours(output,[c],-1 , 255, 1)
+	image_no = randint(0,100)
+	cv2.imwrite('/home/uddipan/Documents/NetDetection/Detected_Images/NetDefect'+ str(image_no) +'.png',output)
+	return(output)
+'''	
 	c = max(contours, key = cv2.contourArea)
+	#print(contours.shape)
 	#cv2.drawContours(output, [c], -1, (0,0,255), 3)
 	#return(output)
 	#cv2.imshow("Final_Image",output)
@@ -32,14 +79,15 @@ def DetectHoles(img):
 			break;
 
 	if false_detection == True:
+		index = Find_Index()
 		cv2.drawContours(output, [c], -1, (0,0,255), 3)
 		return(output)
 	else:
 		cv2.drawContours(output,[c], -1 , 255, 1)
 		image_no = randint(0,100)
 
-		cv2.imwrite('/home/uddipan/Documents/NetDetection/Detected_Images/NetDefect'+ str(image_no) +'.png',output)
-		return(output)
+'''
+
 
 
 
@@ -79,7 +127,7 @@ def WriteVideo(frame):
 
 
 
-cap = cv2.VideoCapture('/home/uddipan/Documents/Aquaai/bagfile_images/output.mpg')
+cap = cv2.VideoCapture('/home/uddipan/Downloads/fish_net.mpg')
 
 
 writer = None
